@@ -22,19 +22,20 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost:3000'], 
+    origin: ['http://localhost:5173', 'https://thumbnailx.vercel.app'], 
     credentials: true
 }))
 app.use(express.json());
-
-
-app.use(express.json())
 
 app.use(session({
     secret: process.env.SESSION_SECRET as string,
     resave: false,
     saveUninitialized: false,
-    cookie: {maxAge: 1000 * 60 * 60 * 24 * 7}, // 7 days
+    cookie: {
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+},
     store: MongoStore.create({
         mongoUrl: process.env.MONGODB_URI as string,
         collectionName: 'sessions'
